@@ -33,6 +33,28 @@ export type ItemsPublic = {
   count: number
 }
 
+
+export type SiteCreate = {
+  url: string
+  name: string
+}
+
+export type SitePublic = {
+  name: string
+  id: string
+  owner_id: string
+}
+
+export type SiteUpdate = {
+  name: string | null
+  url: string | null
+}
+
+export type SitesPublic = {
+  data: Array<SitePublic>
+  count: number
+}
+
 export type Message = {
   message: string
 }

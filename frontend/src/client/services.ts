@@ -15,9 +15,13 @@ import type {
   UserUpdate,
   UserUpdateMe,
   ItemCreate,
+  ItemUpdate,
   ItemPublic,
   ItemsPublic,
-  ItemUpdate,
+  SiteCreate,
+  SitePublic,
+  SitesPublic,
+  SiteUpdate,
 } from "./models"
 
 export type TDataLoginAccessToken = {
@@ -400,6 +404,7 @@ export class UtilsService {
   }
 }
 
+
 export type TDataReadItems = {
   limit?: number
   skip?: number
@@ -527,3 +532,135 @@ export class ItemsService {
     })
   }
 }
+
+
+export type TDataReadSites = {
+  limit?: number
+  skip?: number
+}
+export type TDataCreateSite = {
+  requestBody: SiteCreate
+}
+export type TDataReadSite = {
+  id: string
+}
+export type TDataUpdateSite = {
+  id: string
+  requestBody: SiteUpdate
+}
+export type TDataDeleteSite = {
+  id: string
+}
+
+export class SitesService {
+  /**
+   * Read Sites
+   * Retrieve sites.
+   * @returns SitesPublic Successful Response
+   * @throws ApiError
+   */
+  public static readSites(
+    data: TDataReadSites = {},
+  ): CancelablePromise<SitesPublic> {
+    const { limit = 100, skip = 0 } = data
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/sites/",
+      query: {
+        skip,
+        limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Create Site
+   * Create new item.
+   * @returns SitePublic Successful Response
+   * @throws ApiError
+   */
+  public static createSite(
+    data: TDataCreateSite,
+  ): CancelablePromise<SitePublic> {
+    const { requestBody } = data
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/sites/",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Read Site
+   * Get item by ID.
+   * @returns SitePublic Successful Response
+   * @throws ApiError
+   */
+  public static readSite(data: TDataReadSite): CancelablePromise<SitePublic> {
+    const { id } = data
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/sites/{id}",
+      path: {
+        id,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Update Site
+=   * @returns SitePublic Successful Response
+   * @throws ApiError
+   */
+  public static updateSite(
+    data: TDataUpdateSite,
+  ): CancelablePromise<SitePublic> {
+    const { id, requestBody } = data
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/v1/sites/{id}",
+      path: {
+        id,
+      },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Delete Site
+   * Delete an site.
+   * @returns Message Successful Response
+   * @throws ApiError
+   */
+  public static deleteSite(data: TDataDeleteSite): CancelablePromise<Message> {
+    const { id } = data
+    return __request(OpenAPI, {
+      method: "DELETE",
+      url: "/api/v1/sites/{id}",
+      path: {
+        id,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+}
+
+
+
+

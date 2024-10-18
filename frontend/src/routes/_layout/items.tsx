@@ -103,7 +103,7 @@ function ItemsTable() {
                     {item.description || "N/A"}
                   </Td>
                   <Td>
-                    <ActionsMenu type={"Item"} value={item} />
+                    <ActionsMenu type={"Site"} value={item} />
                   </Td>
                 </Tr>
               ))}
@@ -128,7 +128,7 @@ function Items() {
         Items Management
       </Heading>
 
-      <Navbar type={"Item"} addModalAs={AddItem} />
+      <Navbar type={"Site"} addModalAs={AddItem} />
       <ItemsTable />
     </Container>
   )

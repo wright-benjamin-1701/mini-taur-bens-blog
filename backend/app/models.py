@@ -3,7 +3,6 @@ import uuid
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
-
 # Shared properties
 class UserBase(SQLModel):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
@@ -44,6 +43,7 @@ class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    sites: list["Site"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -112,3 +112,44 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)
+
+
+# Shared properties
+class SiteBase(SQLModel):
+    name: str = Field(max_length=255)
+    url: str | None = Field(default=None, max_length=255)
+
+
+# Properties to receive via API on creation
+class SiteCreate(SiteBase):
+    pass
+
+
+# Properties to receive via API on update, all are optional
+class SiteUpdate(SiteBase):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(unique=True, index=True, max_length=255)
+    updated: str = Field(max_length=255)
+
+
+# Database model, database table inferred from class name
+class Site(SiteBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=255)
+    url: str = Field(default=None, max_length=255)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    owner: User | None = Relationship(back_populates="sites")
+
+
+# Properties to return via API, id is always required
+class SitePublic(SiteBase):
+    id: uuid.UUID
+    name: str
+    owner_id: uuid.UUID
+
+
+class SitesPublic(SQLModel):
+    data: list[SitePublic]
+    count: int
