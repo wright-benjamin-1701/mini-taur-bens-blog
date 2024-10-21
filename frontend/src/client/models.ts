@@ -43,6 +43,10 @@ export type SitePublic = {
   name: string
   id: string
   owner_id: string
+  updated?: string | null
+  last_retrieved?: string | null
+  url: string
+  content?: string | null
 }
 
 export type SiteUpdate = {

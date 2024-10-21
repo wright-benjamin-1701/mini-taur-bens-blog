@@ -118,7 +118,9 @@ class NewPassword(SQLModel):
 class SiteBase(SQLModel):
     name: str = Field(max_length=255)
     url: str | None = Field(default=None, max_length=255)
-
+    updated: str | None = Field(default=None, max_length=255)
+    last_retrieved: str | None = Field(default=None, max_length=255)
+    content: str | None = Field(default=None)
 
 # Properties to receive via API on creation
 class SiteCreate(SiteBase):
@@ -127,16 +129,12 @@ class SiteCreate(SiteBase):
 
 # Properties to receive via API on update, all are optional
 class SiteUpdate(SiteBase):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str = Field(unique=True, index=True, max_length=255)
-    updated: str = Field(max_length=255)
-
+    pass
 
 # Database model, database table inferred from class name
 class Site(SiteBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str = Field(max_length=255)
-    url: str = Field(default=None, max_length=255)
+
     owner_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )

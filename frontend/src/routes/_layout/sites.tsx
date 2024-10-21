@@ -65,6 +65,12 @@ function SitesTable() {
       queryClient.prefetchQuery(getSitesQueryOptions({ page: page + 1 }))
       }
     }, [page, queryClient, hasNextPage])
+
+    useEffect(()=>{
+
+      SitesService.updateSites();
+
+    },[])
   
     return (
       <>

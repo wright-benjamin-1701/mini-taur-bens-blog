@@ -7,6 +7,10 @@ from sqlmodel import func, select
 from app.api.deps import CurrentUser, SessionDep
 from app.models import Site, SiteCreate, SitePublic, SitesPublic, SiteUpdate, Message
 
+import requests
+import datetime
+import app.crud as crud
+
 router = APIRouter()
 
 
@@ -37,6 +41,31 @@ def read_sites(
             .limit(limit)
         )
         sites = session.exec(statement).all()
+
+    return SitesPublic(data=sites, count=count)
+
+
+@router.put("/update", response_model=SitesPublic)
+def update_sites(session: SessionDep, current_user: CurrentUser):
+    # TODO: refactor as much as possible into CRUD
+    if current_user.is_superuser:
+        count_statement = select(func.count()).select_from(Site)
+        count = session.exec(count_statement).one()
+        statement = select(Site)
+        sites = session.exec(statement).all()
+    else:
+        count_statement = (
+            select(func.count())
+            .select_from(Site)
+            .where(Site.owner_id == current_user.id)
+        )
+        count = session.exec(count_statement).one()
+        statement = select(Site).where(Site.owner_id == current_user.id)
+        sites = session.exec(statement).all()
+
+    for site in sites:
+        content = requests.get(site.url).text
+        site = crud.update_site(session=session, db_site=site, new_content=content)
 
     return SitesPublic(data=sites, count=count)
 

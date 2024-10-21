@@ -659,6 +659,18 @@ export class SitesService {
       },
     })
   }
+
+  public static updateSites(): CancelablePromise<Message> {
+    
+    return __request(OpenAPI, {
+      method: "PUT",
+      url: "/api/v1/sites/update",
+      
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
 }
 
 

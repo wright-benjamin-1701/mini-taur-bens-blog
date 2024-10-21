@@ -2,9 +2,19 @@ import uuid
 from typing import Any
 
 from sqlmodel import Session, select
+from datetime import datetime
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, Site, SiteCreate
+from app.models import (
+    Item,
+    ItemCreate,
+    SiteUpdate,
+    User,
+    UserCreate,
+    UserUpdate,
+    Site,
+    SiteCreate,
+)
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -56,6 +66,28 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
 
 def create_site(*, session: Session, site_in: SiteCreate, owner_id: uuid.UUID) -> Site:
     db_site = Item.model_validate(site_in, update={"owner_id": owner_id})
+    session.add(db_site)
+    session.commit()
+    session.refresh(db_site)
+    return db_site
+
+
+def update_site(
+    *,
+    session: Session,
+    db_site: Site,
+    new_content: str,
+):
+    now = datetime.now().isoformat()
+    extra_data = {}
+    extra_data["last_retrieved"] = now
+    if (
+        new_content != db_site.content
+    ):  # todo - use ML to let this comparison be more fuzzy
+        extra_data["content"] = new_content
+        extra_data["updated"] = now
+
+    db_site.sqlmodel_update(db_site, update=extra_data)
     session.add(db_site)
     session.commit()
     session.refresh(db_site)
