@@ -9,6 +9,10 @@ import jwt
 from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
 
+import requests
+from bs4 import BeautifulSoup
+import urllib.parse
+
 from app.core import security
 from app.core.config import settings
 
@@ -121,3 +125,50 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+def get_site_content(url: str) -> str | None:
+    try:
+        content = requests.get(url).text
+        pretty_content = BeautifulSoup(content, "html.parser").text
+        return pretty_content
+    except:
+        return None
+
+
+def get_time() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def ensure_https(url):
+    """
+    Ensure the given URL starts with 'https://'.
+
+    Args:
+        url (str): The input URL string.
+
+    Returns:
+        str: The URL with 'https://' prepended if it doesn't already start with 'http://' or 'https://'.
+    """
+    # Parse the URL to check its scheme
+    parsed_url = urllib.parse.urlparse(url)
+
+    # Check if the URL already starts with 'https://'
+    if not (parsed_url.scheme == "https"):
+        # Reconstruct the URL with 'https://' scheme
+        netloc = parsed_url.netloc or ""
+        path = parsed_url.path or "/"
+        query = parsed_url.query or ""
+        fragment = parsed_url.fragment or ""
+
+        url = (
+            "https://"
+            + netloc
+            + path
+            + ("?" if query else "")
+            + query
+            + ("#" if fragment else "")
+            + fragment
+        )
+
+    return url

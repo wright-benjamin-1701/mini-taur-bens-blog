@@ -7,8 +7,7 @@ from sqlmodel import func, select
 from app.api.deps import CurrentUser, SessionDep
 from app.models import Site, SiteCreate, SitePublic, SitesPublic, SiteUpdate, Message
 
-import requests
-import datetime
+import app.utils as utils
 import app.crud as crud
 
 router = APIRouter()
@@ -64,7 +63,7 @@ def update_sites(session: SessionDep, current_user: CurrentUser):
         sites = session.exec(statement).all()
 
     for site in sites:
-        content = requests.get(site.url).text
+        content = utils.get_site_content(site.url)
         site = crud.update_site(session=session, db_site=site, new_content=content)
 
     return SitesPublic(data=sites, count=count)
@@ -90,6 +89,9 @@ def create_site(
     """
     Create new site.
     """
+
+    site_in.url = utils.ensure_https(site_in.url)
+
     site = Site.model_validate(site_in, update={"owner_id": current_user.id})
     session.add(site)
     session.commit()

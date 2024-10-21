@@ -40,7 +40,25 @@ function getSitesQueryOptions({ page }: { page: number }) {
     queryKey: ["sites", { page }],
     }
   }
-  
+
+  function parseISOString(s:string) {
+    let b = s.split(/\D+/) as unknown as number[];
+    return new Date(Date.UTC(b[0], b[1], b[2], b[3], b[4], b[5], b[6]));
+  }
+
+function DateFromIso(isoDate:string|null|undefined) {
+  if(isoDate==null || isoDate==undefined){
+    return null;
+  }
+  const dateObj = parseISOString(isoDate) as Date;
+  return (
+    <>
+    {dateObj.getUTCMonth() + '/' + dateObj.getUTCDate() + '/'  + dateObj.getUTCFullYear()}
+    </>
+
+  )
+}
+
 function SitesTable() {
     const queryClient = useQueryClient()
     const { page } = Route.useSearch()
@@ -70,7 +88,9 @@ function SitesTable() {
 
       SitesService.updateSites();
 
-    },[])
+    },[sites])
+
+    
   
     return (
       <>
@@ -80,6 +100,8 @@ function SitesTable() {
               <Tr>
                 
                 <Th>Name</Th>
+                <Th>Last Updated</Th>
+                <Th>Link</Th>
                 <Th>Actions</Th>
               </Tr>
             </Thead>
@@ -102,8 +124,8 @@ function SitesTable() {
                     {site.name}
                     </Td>
 
-
-                  
+                    <Td>{DateFromIso(site.updated)}</Td>
+                    <Td><u><a href={site.url} target="_blank">{site.url}</a></u></Td>
                     <Td>
                     <ActionsMenu type={"Site"} value={site} />
                     </Td>

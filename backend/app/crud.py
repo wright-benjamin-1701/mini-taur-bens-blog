@@ -2,7 +2,7 @@ import uuid
 from typing import Any
 
 from sqlmodel import Session, select
-from datetime import datetime
+from app.utils import get_time
 
 from app.core.security import get_password_hash, verify_password
 from app.models import (
@@ -78,7 +78,7 @@ def update_site(
     db_site: Site,
     new_content: str,
 ):
-    now = datetime.now().isoformat()
+    now = get_time()
     extra_data = {}
     extra_data["last_retrieved"] = now
     if (
