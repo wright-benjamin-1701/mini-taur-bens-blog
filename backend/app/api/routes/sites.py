@@ -63,8 +63,10 @@ def update_sites(session: SessionDep, current_user: CurrentUser):
         sites = session.exec(statement).all()
 
     for site in sites:
-        content = utils.get_site_content(site.url)
-        site = crud.update_site(session=session, db_site=site, new_content=content)
+        # todo: only fetch if the last_retrieved is more than 1 day old
+        if utils.is_older_than_one_day(site.last_retrieved):
+            content = utils.get_site_content(site.url)
+            site = crud.update_site(session=session, db_site=site, new_content=content)
 
     return SitesPublic(data=sites, count=count)
 

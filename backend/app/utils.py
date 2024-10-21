@@ -172,3 +172,21 @@ def ensure_https(url):
         )
 
     return url
+
+
+def is_older_than_one_day(iso_date_string):
+
+    if iso_date_string == None or iso_date_string.strip() == "":
+        return True
+
+    # Parse the ISO-formatted date string into a datetime object
+    iso_date = datetime.fromisoformat(iso_date_string)
+
+    # Get the current time as a datetime object
+    now = datetime.now(timezone.utc)
+
+    # Calculate the difference between the current time and the parsed datetime
+    delta = now - iso_date
+
+    # Check if this difference is more than one day (24 hours)
+    return delta > timedelta(days=1)
