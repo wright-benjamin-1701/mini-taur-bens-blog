@@ -1,0 +1,24 @@
+1. Change Item to Site
+2. Edit item only requires URL now (hidden feature - can use for APIs as well as HTML, so title may not exist)
+3. Title auto-grabs from Site
+4. Added backend rows for site content, last updated/added
+5. Add dashboard button to refresh sites - should not automatically run on login or view
+6. Ability to add site tags and categories (dashboard can filter/sort by tag)
+7. Train an algorithm to assess likeliness of an update.
+
+New backend fields:
+
+Table: Site
+- id
+- title
+- URL
+- owner id
+
+for 1/4 and 6, will need to run alembic migrations per the backend readme instructions
+
+reinstate alembic migrations and take out the SQLmodel lines in database core as in the readme
+
+to make model changes otherwise - compose down AND delete the volume
+
+Ideas: all the fetching is done on the client. no loss in function bbc they need to be connected to the internet anyway. 
+If the last retrieved is within a day, dont retrieve. (nope, cors too many issues)
